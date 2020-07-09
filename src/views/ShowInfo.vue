@@ -57,8 +57,8 @@ export default {
         this.nowCases += dayData.cases || 0
         this.totalRecovered += dayData.recovered || 0
         this.totalDeaths += dayData.deaths || 0
-        this.totalCases += (this.nowCases + this.totalRecovered + this.totalDeaths)
       }
+      this.totalCases += this.nowCases + this.totalRecovered + this.totalDeaths
     },
     // 获取省级信息
     async provinceData () {
