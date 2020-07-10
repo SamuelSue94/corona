@@ -43,14 +43,14 @@
                :visible.sync="dialogVisible"
                width="60%">
       <!--表单-->
-      <el-form :model="editPerson">
-        <el-form-item label="姓名" required>
+      <el-form ref="form" :model="editPerson" :rules="rules">
+        <el-form-item label="姓名" prop="name">
           <el-input v-model="editPerson.name"></el-input>
         </el-form-item>
-        <el-form-item label="身份证" required>
+        <el-form-item label="身份证" prop="id_card">
           <el-input v-model="editPerson.id_card"></el-input>
         </el-form-item>
-        <el-form-item label="所在地">
+        <el-form-item label="所在地" prop="area_code">
           <city-select v-model="editPerson.area_code" ref="edit"
                        class="filter"></city-select>
         </el-form-item>
@@ -99,6 +99,13 @@ export default {
         id_card: '',
         area_code: '',
         status: 1
+      },
+      rules: {
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        id_card: [{ required: true, message: '请输入身份证号', trigger: 'blur' },
+          { min: 15, max: 18, message: '请正确填写身份证号' },
+          { required: true, pattern: /^(\d{6})(\d{4})(\d{2})(\d{2})(\d{3})([0-9]|X)$/, message: '身份证格式有误' }],
+        area_code: [{ required: true, pattern: /^\d{6}$/, message: '请选择所在地区', trigger: 'change' }]
       }
     }
   },
@@ -191,37 +198,50 @@ export default {
     },
     handleCancel () {
       this.dialogVisible = false
+      this.resetForm()
     },
     handleAreaChange (codes) {
       this.editPerson.areacodes = codes
     },
+    resetForm (formName) {
+      this.$refs.form.resetFields()
+    },
     async handleSubmit () {
-      if (this.dialogTitle === '编辑信息') {
-        const resp = await updatePerson({
-          id: this.editPerson.id,
-          name: this.editPerson.name,
-          id_card: this.editPerson.id_card,
-          areacode: this.editPerson.areacodes[2],
-          status: this.editPerson.status
-        })
-        if (resp.data.changedRows) {
-          this.$message.success('修改成功')
-          this.updateData()
-          this.dialogVisible = false
+      this.$refs.form.validate(async (valid) => {
+        if (valid) {
+          if (this.dialogTitle === '编辑信息') {
+            const resp = await updatePerson({
+              id: this.editPerson.id,
+              name: this.editPerson.name,
+              id_card: this.editPerson.id_card,
+              areacode: this.editPerson.areacodes[2],
+              status: this.editPerson.status
+            })
+            if (resp.data.changedRows) {
+              this.$message.success('修改成功')
+              this.updateData()
+              this.dialogVisible = false
+              this.resetForm()
+            }
+          } else {
+            const resp = await createPerson({
+              name: this.editPerson.name,
+              id_card: this.editPerson.id_card,
+              areacode: this.editPerson.areacodes[2],
+              status: this.editPerson.status
+            })
+            if (resp.data.affectedRows) {
+              this.$message.success('添加成功')
+              this.updateData()
+              this.dialogVisible = false
+              this.resetForm()
+            }
+          }
+        } else {
+          this.$message.error('请修改表单')
+          return false
         }
-      } else {
-        const resp = await createPerson({
-          name: this.editPerson.name,
-          id_card: this.editPerson.id_card,
-          areacode: this.editPerson.areacodes[2],
-          status: this.editPerson.status
-        })
-        if (resp.data.affectedRows) {
-          this.$message.success('添加成功')
-          this.updateData()
-          this.dialogVisible = false
-        }
-      }
+      })
     }
   },
   created () {
