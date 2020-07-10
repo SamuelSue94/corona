@@ -43,7 +43,7 @@
                :visible.sync="dialogVisible"
                width="60%">
       <!--表单-->
-      <el-form :model="editPerson" ref="ruleForm" :rules="rules">
+      <el-form :model="editPerson">
         <el-form-item label="姓名" required>
           <el-input v-model="editPerson.name"></el-input>
         </el-form-item>
@@ -51,7 +51,7 @@
           <el-input v-model="editPerson.id_card"></el-input>
         </el-form-item>
         <el-form-item label="所在地">
-          <city-select @valueChange="handleAreaChange" ref="edit" :areaid="editPerson.area_code"
+          <city-select v-model="editPerson.area_code" @valueChange="handleAreaChange" ref="edit"
                        class="filter"></city-select>
         </el-form-item>
         <el-form-item label="状态">
@@ -139,7 +139,7 @@ export default {
       const province = this.areas.find(item => item.codeid === row.areacode.toString().substring(0, 2))
       const city = this.areas.find(item => item.codeid === row.areacode.toString().substring(0, 4))
       const area = this.areas.find(item => item.codeid === row.areacode.toString())
-      return province.cityName + city.cityName + area.cityName
+      if (province && city && area) return province.cityName + city.cityName + area.cityName
     },
     getStatus ({ row }) {
       switch (row.status) {

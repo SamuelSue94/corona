@@ -22,6 +22,10 @@ export default {
   props: {
     areaid: String
   },
+  model: {
+    props: 'areaid',
+    event: 'returnBack'
+  },
   data () {
     return {
       // areas: [], // 地区数据
@@ -68,6 +72,7 @@ export default {
     },
     emitData () {
       this.$emit('valueChange', this.changedValue) // 自定义事件
+      this.$emit('returnBack', this.changedValue) // v-model返回值
     },
     updateData () {
       if (this.areaid) {
