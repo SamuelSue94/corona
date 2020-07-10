@@ -51,7 +51,7 @@
           <el-input v-model="editPerson.id_card"></el-input>
         </el-form-item>
         <el-form-item label="所在地">
-          <city-select v-model="editPerson.area_code" @valueChange="handleAreaChange" ref="edit"
+          <city-select v-model="editPerson.area_code" ref="edit"
                        class="filter"></city-select>
         </el-form-item>
         <el-form-item label="状态">
@@ -168,6 +168,7 @@ export default {
     },
     handleEdit ({ row }) {
       this.dialogTitle = '编辑信息'
+      console.log('row:', row.areacode)
       this.editPerson = {
         id: row.id,
         name: row.name,
@@ -195,38 +196,32 @@ export default {
       this.editPerson.areacodes = codes
     },
     async handleSubmit () {
-      this.$refs['ruleForm'].validate(async (valid) => {
-        if (valid) {
-          if (this.dialogTitle === '编辑信息') {
-            const resp = await updatePerson({
-              id: this.editPerson.id,
-              name: this.editPerson.name,
-              id_card: this.editPerson.id_card,
-              areacode: this.editPerson.areacodes[2],
-              status: this.editPerson.status
-            })
-            if (resp.data.changedRows) {
-              this.$message.success('修改成功')
-              this.updateData()
-              this.dialogVisible = false
-            }
-          } else {
-            const resp = await createPerson({
-              name: this.editPerson.name,
-              id_card: this.editPerson.id_card,
-              areacode: this.editPerson.areacodes[2],
-              status: this.editPerson.status
-            })
-            if (resp.data.affectedRows) {
-              this.$message.success('添加成功')
-              this.updateData()
-              this.dialogVisible = false
-            }
-          }
-        } else {
-          return false
+      if (this.dialogTitle === '编辑信息') {
+        const resp = await updatePerson({
+          id: this.editPerson.id,
+          name: this.editPerson.name,
+          id_card: this.editPerson.id_card,
+          areacode: this.editPerson.areacodes[2],
+          status: this.editPerson.status
+        })
+        if (resp.data.changedRows) {
+          this.$message.success('修改成功')
+          this.updateData()
+          this.dialogVisible = false
         }
-      })
+      } else {
+        const resp = await createPerson({
+          name: this.editPerson.name,
+          id_card: this.editPerson.id_card,
+          areacode: this.editPerson.areacodes[2],
+          status: this.editPerson.status
+        })
+        if (resp.data.affectedRows) {
+          this.$message.success('添加成功')
+          this.updateData()
+          this.dialogVisible = false
+        }
+      }
     }
   },
   created () {

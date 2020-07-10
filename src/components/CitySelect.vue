@@ -23,7 +23,7 @@ export default {
     areaid: String
   },
   model: {
-    props: 'areaid',
+    prop: 'areaid',
     event: 'returnBack'
   },
   data () {
@@ -72,9 +72,10 @@ export default {
     },
     emitData () {
       this.$emit('valueChange', this.changedValue) // 自定义事件
-      this.$emit('returnBack', this.changedValue) // v-model返回值
+      this.$emit('returnBack', this.changedValue[2]) // v-model返回值
     },
     updateData () {
+      console.log('component:', this.areaid)
       if (this.areaid) {
         this.provinceCode = this.areaid.substring(0, 2)
         this.filterCity(this.provinceCode)
